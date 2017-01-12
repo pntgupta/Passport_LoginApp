@@ -8,7 +8,7 @@ var userSchema = mongoose.Schema({
 	password : {type: String, required: true},
 });
 
-module.exports = mongoose.model("users",userSchema);
+var userModule = module.exports = mongoose.model("users",userSchema);
 
 //module.exports userModel;
 
@@ -21,5 +21,20 @@ module.exports.registerUser = function(newUser,callback){
 	        newUser.password = hash;
 	        newUser.save(callback);
 	    });
+	});
+}
+
+module.exports.getUserByUsername = function(userName,callback){
+	userModule.findOne({username:userName},callback);
+}
+module.exports.getUserByUserID = function(userID,callback){
+	userModule.findById(userID,callback);
+}
+module.exports.validatePassword = function(password,hash,callback){
+	bcrypt.compare(password,hash,function(err,isMatch){
+		if(err)
+			throw err;
+		else
+			callback(null,isMatch)
 	});
 }
