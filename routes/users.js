@@ -1,5 +1,5 @@
 var router = require('express').Router(),
-	user = require('../models/user.js'),
+	User = require('../models/user.js'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy;
 
@@ -33,35 +33,29 @@ router.post("/register",function(req,res){
 		res.render("register",{errors:error});
 	else{
 		//Saving in Mongo DB
-		var newUser = new user({name:name,username:username,email:email,password:password});
+		var newUser = new User({name:name,username:username,email:email,password:password});
 
-		user.registerUser(newUser,function(err,user){
+		User.registerUser(newUser,function(err,user){
 			if (err)
 				throw err;
 		});
 
-		req.flash('success', 'You are registered and can now login');
-		res.location('/');
+		req.flash('success_msg', 'You are registered and can now login');
 		res.redirect("/");
 	}
 
 })
 
-// router.get('/punit',function(req,res){
-// 	req.flash("success_msg","aaaaaaaaaaaaaaaa");
-// 	res.redirect("/");
-// })
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    user.getUserByUsername(username,function(err,userInfo){
+    User.getUserByUsername(username,function(err,userInfo){
     	if(err)
     		throw err;
     	else if(!userInfo)
     		return done(null,false,{message:'Unknown User!'});
     	else{
-    		user.validatePassword(password,userInfo.password,function(err,isMatch){
-    			console.log("aa");
+    		User.validatePassword(password,userInfo.password,function(err,isMatch){
     			if(err)
     				throw err;
     			else if(!isMatch)
@@ -87,7 +81,13 @@ passport.deserializeUser(function(id, done) {
 router.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }),
 	 function(req,res){
 	 	res.redirect('/');
-	 });
+});
+
+router.get('/logout',function(req,res){
+	req.logout();
+	req.flash("success_msg","You are logged out");
+	res.redirect('/users/login');
+})
 
 
 

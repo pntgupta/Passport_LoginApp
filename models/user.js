@@ -27,7 +27,7 @@ module.exports.registerUser = function(newUser,callback){
 module.exports.getUserByUsername = function(userName,callback){
 	userModule.findOne({username:userName},callback);
 }
-module.exports.getUserByUserID = function(userID,callback){
+module.exports.getUserByID = function(userID,callback){
 	userModule.findById(userID,callback);
 }
 module.exports.validatePassword = function(password,hash,callback){
